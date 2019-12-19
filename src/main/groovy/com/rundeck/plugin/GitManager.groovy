@@ -200,13 +200,12 @@ class GitManager {
         //start the new repo, if the repo is create nothing will be done
         this.cloneOrCreate(base, gitURL)
 
-        File file = new File(localPath+"/"+fileName)
-
         //always perform a pull
         //TODO: check if it is needed check for the repo status
         //and perform the pull when the last commit is different to the last commit on the local repo
         this.gitPull()
 
+        File file = new File(localPath+"/"+fileName)
         return file.newInputStream()
 
     }
