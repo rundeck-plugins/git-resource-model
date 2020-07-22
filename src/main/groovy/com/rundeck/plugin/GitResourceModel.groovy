@@ -10,14 +10,12 @@ import com.dtolabs.rundeck.core.resources.format.ResourceFormatParser
 import com.dtolabs.rundeck.core.resources.format.ResourceFormatParserException
 import com.dtolabs.rundeck.core.resources.format.UnsupportedFormatException
 import com.dtolabs.utils.Streams
-import org.apache.log4j.Logger
 
 
 /**
  * Created by luistoledo on 12/18/17.
  */
 class GitResourceModel implements ResourceModelSource , WriteableModelSource{
-    static Logger logger = Logger.getLogger(GitResourceModel.class);
 
     private Properties configuration;
     private Framework framework;
