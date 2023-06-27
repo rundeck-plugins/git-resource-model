@@ -1,8 +1,11 @@
 package com.rundeck.plugin.util
 
+import com.dtolabs.rundeck.core.execution.workflow.steps.StepException
 import com.dtolabs.rundeck.core.plugins.configuration.StringRenderingConstants
 import com.dtolabs.rundeck.core.storage.ResourceMeta
-import com.dtolabs.rundeck.plugins.step.PluginStepContext
+import com.dtolabs.rundeck.core.storage.StorageTree
+import com.rundeck.plugin.GitFailureReason
+
 
 /**
  * Created by luistoledo on 12/18/17.
@@ -24,6 +27,32 @@ class GitPluginUtil {
         }
 
         return ret;
+    }
+
+    static String getPasswordFromKeyStorage(String path, StorageTree storage) {
+        try{
+            ResourceMeta contents = storage.getResource(path).getContents()
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()
+            contents.writeContent(byteArrayOutputStream)
+            String password = new String(byteArrayOutputStream.toByteArray())
+
+            return password
+        }catch(Exception e){
+            throw new StepException("error accessing ${path}: ${e.message}", GitFailureReason.KeyStorage)
+        }
+
+    }
+
+    static String getSshKeyFromKeyStorage(String path, StorageTree storage) {
+        try{
+            ResourceMeta contents = storage.getResource(path).getContents()
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()
+            contents.writeContent(byteArrayOutputStream)
+            return byteArrayOutputStream.toByteArray()
+        }catch(Exception e){
+            throw new StepException("error accessing ${path}: ${e.message}", GitFailureReason.KeyStorage)
+        }
+
     }
 
 }

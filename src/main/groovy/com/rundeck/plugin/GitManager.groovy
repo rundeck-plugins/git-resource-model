@@ -10,6 +10,9 @@ import org.eclipse.jgit.transport.RemoteRefUpdate
 import org.eclipse.jgit.transport.URIish
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider
 import org.eclipse.jgit.util.FileUtils
+import org.rundeck.app.spi.Services
+import com.dtolabs.rundeck.core.storage.keys.KeyStorageTree
+import com.rundeck.plugin.util.GitPluginUtil
 
 import java.nio.file.Files
 import java.nio.file.Path
@@ -34,15 +37,20 @@ class GitManager {
     String sshPrivateKeyPath
     String gitPassword
     String gitURL
+    String gitPasswordKeyStoragePath
+    String gitSshKeyKeyStoragePath
+    Services services
 
-    GitManager(Properties configuration) {
+    GitManager(Properties configuration, Services services) {
         this.gitURL=configuration.getProperty(GitResourceModelFactory.GIT_URL)
         this.branch = configuration.getProperty(GitResourceModelFactory.GIT_BRANCH)
         this.fileName=configuration.getProperty(GitResourceModelFactory.GIT_FILE)
         this.strictHostKeyChecking=configuration.getProperty(GitResourceModelFactory.GIT_HOSTKEY_CHECKING)
         sshPrivateKeyPath=configuration.getProperty(GitResourceModelFactory.GIT_KEY_STORAGE)
         gitPassword=configuration.getProperty(GitResourceModelFactory.GIT_PASSWORD_STORAGE)
-
+        this.gitPasswordKeyStoragePath=configuration.getProperty(GitResourceModelFactory.GIT_PASSWORD_KEY_STORAGE_PATH)
+        this.gitSshKeyKeyStoragePath=configuration.getProperty(GitResourceModelFactory.GIT_SSH_KEY_KEY_STORAGE_PATH)
+        this.services = services
     }
 
     Map<String, String> getSshConfig() {
@@ -130,6 +138,17 @@ class GitManager {
             def factory = new PluginSshSessionFactory(keyData)
             factory.sshConfig = sshConfig
             command.setTransportConfigCallback(factory)
+        } else if ((u.scheme == null || u.scheme == 'ssh') && u.user && gitSshKeyKeyStoragePath) {
+            KeyStorageTree keyStorage = services.getService(KeyStorageTree.class)
+            String key = GitPluginUtil.getPasswordFromKeyStorage(gitSshKeyKeyStoragePath, keyStorage)
+            byte[] keyData = key.getBytes();
+            def factory = new PluginSshSessionFactory(keyData)
+            factory.sshConfig = sshConfig
+            command.setTransportConfigCallback(factory)
+        } else if (u.user && gitPasswordKeyStoragePath) {
+            KeyStorageTree keyStorage = services.getService(KeyStorageTree.class)
+            String key = GitPluginUtil.getPasswordFromKeyStorage(gitPasswordKeyStoragePath, keyStorage)
+            command.setCredentialsProvider(new UsernamePasswordCredentialsProvider(u.user, key))
         } else if (u.user && gitPassword) {
             logger.debug("using password")
 
