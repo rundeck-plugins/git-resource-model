@@ -46,20 +46,26 @@ configurations {
 
 
 dependencies {
-    compile 'org.codehaus.groovy:groovy-all:2.3.11'
+    compile 'org.codehaus.groovy:groovy-all:3.0.0'
     testCompile group: 'junit', name: 'junit', version: '4.12'
 
-    compile group: 'org.rundeck', name: 'rundeck-core', version: '2.10.1'
-    compile 'org.slf4j:slf4j-api:1.7.30'
+    compile group: 'org.rundeck', name: 'rundeck-core', version: '4.14.0-20230615'
+    compile group: 'org.rundeck', name: 'rundeck-storage-api', version: '4.14.0-20230615'
+    compile 'org.slf4j:slf4j-api:2.0.7'
 
-    pluginLibs( 'org.eclipse.jgit:org.eclipse.jgit:3.7.1.201504261725-r') {
+    pluginLibs( 'org.eclipse.jgit:org.eclipse.jgit:6.6.0.202305301015-r') {
         exclude module: 'slf4j-api'
         exclude module: 'jsch'
         exclude module: 'commons-logging'
     }
 
-    testCompile "org.codehaus.groovy:groovy-all:2.3.7"
-    testCompile "org.spockframework:spock-core:0.7-groovy-2.0"
+    pluginLibs( 'org.eclipse.jgit:org.eclipse.jgit.ssh.jsch:6.6.0.202305301015-r') {
+        exclude module: 'slf4j-api'
+        exclude module: 'commons-logging'
+    }
+
+    testCompile "org.codehaus.groovy:groovy-all:3.0.0"
+    testCompile "org.spockframework:spock-core:2.4-M1-groovy-3.0"
     testCompile "cglib:cglib-nodep:2.2.2"
     testCompile 'org.objenesis:objenesis:1.4'
 }
@@ -85,7 +91,7 @@ jar {
 
 
 task wrapper(type: Wrapper) {
-  gradleVersion = '3.3'
-  distributionUrl = "https://services.gradle.org/distributions/gradle-$gradleVersion-all.zip"
+    gradleVersion = '3.3'
+    distributionUrl = "https://services.gradle.org/distributions/gradle-$gradleVersion-all.zip"
 }
 

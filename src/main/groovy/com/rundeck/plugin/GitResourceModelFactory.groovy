@@ -12,6 +12,8 @@ import com.dtolabs.rundeck.plugins.ServiceNameConstants
 import com.dtolabs.rundeck.plugins.descriptions.PluginDescription
 import com.dtolabs.rundeck.plugins.util.DescriptionBuilder
 import com.rundeck.plugin.util.GitPluginUtil
+import org.rundeck.app.spi.Services
+
 
 /**
  * Created by luistoledo on 12/18/17.
@@ -38,11 +40,15 @@ class GitResourceModelFactory implements ResourceModelSourceFactory,Describable 
     public final static String GIT_KEY_STORAGE="gitKeyPath"
     public final static String GIT_PASSWORD_STORAGE="gitPasswordPath"
     public static final String WRITABLE="writable";
+    public static final String GIT_PASSWORD_KEY_STORAGE_PATH = "gitPasswordKeyStoragePath"
+    public static final String GIT_SSH_KEY_KEY_STORAGE_PATH = "gitSshKeyKeyStoragePath"
+
 
 
     final static Map<String, Object> renderingOptionsAuthentication = GitPluginUtil.getRenderOpt("Authentication",false)
     final static Map<String, Object> renderingOptionsAuthenticationPassword = GitPluginUtil.getRenderOpt("Authentication",false, true)
     final static Map<String, Object> renderingOptionsConfig = GitPluginUtil.getRenderOpt("Configuration",false)
+    final static Map<String, Object> renderingOptionsAuthenticationStorage = GitPluginUtil.getRenderOpt("Authentication",false, false, true)
 
     GitResourceModelFactory(Framework framework) {
         this.framework = framework
@@ -79,7 +85,11 @@ Some examples:
 If `yes`, require remote host SSH key is defined in the `~/.ssh/known_hosts` file, otherwise do not verify.''', false,
             "yes",GitResourceModelFactory.LIST_HOSTKEY_CHECKING,null, renderingOptionsAuthentication))
             .property(PropertyUtil.string(GIT_KEY_STORAGE, "SSH Key Path", 'SSH Key Path', false,
-            null,null,null, renderingOptionsAuthentication))
+                    null,null,null, renderingOptionsAuthentication))
+            .property(PropertyUtil.string(GIT_PASSWORD_KEY_STORAGE_PATH, "Password Key Storage Path", "Access password from Rundeck key storage path", false,
+                    null,null,null, renderingOptionsAuthenticationStorage))
+            .property(PropertyUtil.string(GIT_SSH_KEY_KEY_STORAGE_PATH, "SSH Key Storage Path", "Access SSH key from Rundeck key storage path", false,
+                    null,null,null, renderingOptionsAuthenticationStorage))
             .build()
 
 
@@ -95,4 +105,13 @@ If `yes`, require remote host SSH key is defined in the `~/.ssh/known_hosts` fil
 
         return resource
     }
+
+    @Override
+    ResourceModelSource createResourceModelSource(Services services, Properties configuration) throws ConfigurationException {
+        final GitResourceModel resource = new GitResourceModel(configuration,framework,services)
+
+        return resource
+    }
+
+
 }

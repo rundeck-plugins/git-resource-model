@@ -10,6 +10,7 @@ import com.dtolabs.rundeck.core.resources.format.ResourceFormatParser
 import com.dtolabs.rundeck.core.resources.format.ResourceFormatParserException
 import com.dtolabs.rundeck.core.resources.format.UnsupportedFormatException
 import com.dtolabs.utils.Streams
+import org.rundeck.app.spi.Services
 
 
 /**
@@ -19,6 +20,7 @@ class GitResourceModel implements ResourceModelSource , WriteableModelSource{
 
     private Properties configuration;
     private Framework framework;
+    Services services
     private boolean writable=false;
 
     String extension
@@ -31,10 +33,10 @@ class GitResourceModel implements ResourceModelSource , WriteableModelSource{
         this.writable=true;
     }
 
-
-    GitResourceModel(Properties configuration, Framework framework) {
+    GitResourceModel(Properties configuration, Framework framework, Services services) {
         this.configuration = configuration
         this.framework = framework
+        this.services = services
 
         this.extension=configuration.getProperty(GitResourceModelFactory.GIT_FORMAT_FILE)
         this.writable=Boolean.valueOf(configuration.getProperty(GitResourceModelFactory.WRITABLE))
@@ -42,9 +44,8 @@ class GitResourceModel implements ResourceModelSource , WriteableModelSource{
         this.localPath=configuration.getProperty(GitResourceModelFactory.GIT_BASE_DIRECTORY)
 
         if(gitManager==null){
-            gitManager = new GitManager(configuration)
+            gitManager = new GitManager(configuration, services)
         }
-
     }
 
     @Override
