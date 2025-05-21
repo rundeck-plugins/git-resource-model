@@ -1,3 +1,9 @@
+# DEPRECATED
+All functionality from this plugin has been moved to the [Git Plugin hosted here](https://github.com/rundeck-plugins/git-plugin) 
+
+This repository will be archived and no longer maintained.
+
+
 # Rundeck GIT Resource Model
 
 This is a plugin for Rundeck > [2.10.0](http://rundeck.org/) that uses Git to store resources model file (based on [Jgit](https://www.eclipse.org/jgit/)).
